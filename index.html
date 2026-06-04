@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send GPS Location</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:active {
+            background-color: #0056b3;
+        }
+        #status {
+            margin-top: 15px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>GPS Location Sender</h2>
+    <button onclick="sendLocation()">Send My Location</button>
+    <p id="status">Click the button to share your location.</p>
+</div>
+
+<script>
+// CHANGE THIS TO YOUR EMAIL ADDRESS
+const targetEmail = "your-email@example.com"; 
+
+function sendLocation() {
+    const status = document.getElementById('status');
+
+    if (!navigator.geolocation) {
+        status.textContent = "Geolocation is not supported by your browser.";
+        return;
+    }
+
+    status.textContent = "Locating...";
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            
+            // Create a Google Maps link for easy clicking in the email
+            const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+            
+            status.textContent = "Location found! Opening email app...";
+
+            // Construct the email data
+            const subject = encodeURIComponent("My Current GPS Location");
+            const body = encodeURIComponent(`Here is my current location:\n\nLatitude: ${latitude}\nLongitude: ${longitude}\n\nGoogle Maps Link:\n${mapsLink}`);
+            
+            // Trigger the native mail client
+            window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+        },
+        (error) => {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    status.textContent = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    status.textContent = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    status.textContent = "The request to get user location timed out.";
+                    break;
+                default:
+                    status.textContent = "An unknown error occurred.";
+                    break;
+            }
+        },
+        {
+            enableHighAccuracy: true, // Forces Android to use GPS instead of just Wi-Fi
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+</script>
+
+</body>
+</html>
