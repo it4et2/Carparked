@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send GPS Location</title>
+    <title>Secure GPS Location Sender</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,13 +23,36 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             max-width: 90%;
             width: 350px;
+            box-sizing: border-box;
         }
         h2 {
             color: #333;
             margin-bottom: 20px;
+            font-size: 22px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        input[type="password"]:focus {
+            border-color: #007bff;
         }
         button {
-            background-color: #28a745;
             color: white;
             border: none;
             padding: 15px 30px;
@@ -41,28 +64,82 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: background 0.2s;
         }
-        button:active {
+        .btn-login {
+            background-color: #007bff;
+        }
+        .btn-login:active {
+            background-color: #0056b3;
+        }
+        .btn-gps {
+            background-color: #28a745;
+        }
+        .btn-gps:active {
             background-color: #218838;
         }
-        #status {
+        #status, #login-error {
             margin-top: 20px;
-            color: #666;
             font-size: 14px;
             line-height: 1.4;
+        }
+        #status {
+            color: #666;
+        }
+        #login-error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        /* Hidden by default */
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="login-box">
+    <h2>Device Login</h2>
+    <div class="input-group">
+        <label for="password">Enter Access Password:</label>
+        <input type="password" id="password" placeholder="•••••" autofocus>
+    </div>
+    <button class="btn-login" onclick="checkPassword()">Login</button>
+    <p id="login-error" class="hidden">❌ Incorrect password. Try again.</p>
+</div>
+
+<div class="container hidden" id="gps-box">
     <h2>GPS Location Sender</h2>
-    <button onclick="sendLocation()">📍 Share My Location</button>
+    <button class="btn-gps" onclick="sendLocation()">📍 Share My Location</button>
     <p id="status">Tap the button above to generate your location email.</p>
 </div>
 
 <script>
 // ⚠️ CHANGE THIS TO YOUR ACTUAL EMAIL ADDRESS
-const targetEmail = "best4less007@gmail.com"; 
+const targetEmail = "your-email@example.com"; 
+
+// Password verification function
+function checkPassword() {
+    const passwordInput = document.getElementById('password').value;
+    const loginError = document.getElementById('login-error');
+    const loginBox = document.getElementById('login-box');
+    const gpsBox = document.getElementById('gps-box');
+
+    if (passwordInput === "12345") {
+        // Hide login, show GPS panel
+        loginBox.classList.add('hidden');
+        gpsBox.classList.remove('hidden');
+    } else {
+        // Show error message and clear input
+        loginError.classList.remove('hidden');
+        document.getElementById('password').value = '';
+    }
+}
+
+// Allow pressing "Enter" key to log in
+document.getElementById('password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        checkPassword();
+    }
+});
 
 function sendLocation() {
     const status = document.getElementById('status');
