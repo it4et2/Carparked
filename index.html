@@ -79,25 +79,24 @@ function sendLocation() {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             
-            // Standard universal Google Maps URL format
+            // Corrected, clean universal Google Maps link format
             const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
             
             status.textContent = "✅ Location found! Opening your email app...";
 
-            // Subject line with a clear emoji indicator
-            const subject = encodeURIComponent("📍 Urgent: Current GPS Location Shared");
+            // Subject line for the email
+            const subject = encodeURIComponent("📍 Location Shared via GPS");
             
-            // Text-based button design layout optimized for email clients
+            // Isolated link layout to trigger Android's automatic link-preview system
             const body = encodeURIComponent(
                 `I am sharing my current GPS coordinates with you.\n\n` +
+                `Click the link below to view the live location map:\n\n` +
+                `${mapsLink}\n\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                ` ▶️ CLICK LINK TO VIEW LIVE MAP:\n` +
-                ` ${mapsLink}\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
                 `Raw Data Details:\n` +
                 `• Latitude: ${latitude}\n` +
                 `• Longitude: ${longitude}\n` +
-                `• Captured via Android Mobile Browser`
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
             );
             
             // Redirects to native Android mail application
@@ -120,9 +119,9 @@ function sendLocation() {
             }
         },
         {
-            enableHighAccuracy: true, // Forces phone hardware GPS instead of loose cell-tower estimation
-            timeout: 12000,           // Gives the phone up to 12 seconds to stabilize the GPS lock
-            maximumAge: 0             // Prevents browser from pulling cached, old location data
+            enableHighAccuracy: true, // Forces hardware GPS sensor instead of cell tower estimates
+            timeout: 12000,           // Extends timeout threshold to 12 seconds for weak signals
+            maximumAge: 0             // Prevents the browser from pulling old cached data
         }
     );
 }
