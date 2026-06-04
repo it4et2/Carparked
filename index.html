@@ -17,27 +17,38 @@
         }
         .container {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 90%;
+            width: 350px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
         }
         button {
-            background-color: #007bff;
+            background-color: #28a745;
             color: white;
             border: none;
             padding: 15px 30px;
             font-size: 18px;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.2s;
         }
         button:active {
-            background-color: #0056b3;
+            background-color: #218838;
         }
         #status {
-            margin-top: 15px;
-            color: #555;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -45,61 +56,73 @@
 
 <div class="container">
     <h2>GPS Location Sender</h2>
-    <button onclick="sendLocation()">Send My Location</button>
-    <p id="status">Click the button to share your location.</p>
+    <button onclick="sendLocation()">📍 Share My Location</button>
+    <p id="status">Tap the button above to generate your location email.</p>
 </div>
 
 <script>
-// CHANGE THIS TO YOUR EMAIL ADDRESS
+// ⚠️ CHANGE THIS TO YOUR ACTUAL EMAIL ADDRESS
 const targetEmail = "your-email@example.com"; 
 
 function sendLocation() {
     const status = document.getElementById('status');
 
     if (!navigator.geolocation) {
-        status.textContent = "Geolocation is not supported by your browser.";
+        status.textContent = "❌ Geolocation is not supported by your browser.";
         return;
     }
 
-    status.textContent = "Locating...";
+    status.textContent = "🔄 Locating your device via GPS...";
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             
-            // Create a Google Maps link for easy clicking in the email
+            // Standard universal Google Maps URL format
             const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
             
-            status.textContent = "Location found! Opening email app...";
+            status.textContent = "✅ Location found! Opening your email app...";
 
-            // Construct the email data
-            const subject = encodeURIComponent("My Current GPS Location");
-            const body = encodeURIComponent(`Here is my current location:\n\nLatitude: ${latitude}\nLongitude: ${longitude}\n\nGoogle Maps Link:\n${mapsLink}`);
+            // Subject line with a clear emoji indicator
+            const subject = encodeURIComponent("📍 Urgent: Current GPS Location Shared");
             
-            // Trigger the native mail client
+            // Text-based button design layout optimized for email clients
+            const body = encodeURIComponent(
+                `I am sharing my current GPS coordinates with you.\n\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                ` ▶️ CLICK LINK TO VIEW LIVE MAP:\n` +
+                ` ${mapsLink}\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `Raw Data Details:\n` +
+                `• Latitude: ${latitude}\n` +
+                `• Longitude: ${longitude}\n` +
+                `• Captured via Android Mobile Browser`
+            );
+            
+            // Redirects to native Android mail application
             window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
         },
         (error) => {
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    status.textContent = "User denied the request for Geolocation.";
+                    status.textContent = "❌ Permission denied. Please allow location access in your browser settings.";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    status.textContent = "Location information is unavailable.";
+                    status.textContent = "❌ Location unavailable. Check if your phone's GPS/Location setting is turned ON.";
                     break;
                 case error.TIMEOUT:
-                    status.textContent = "The request to get user location timed out.";
+                    status.textContent = "❌ The request to get your location timed out. Try again.";
                     break;
                 default:
-                    status.textContent = "An unknown error occurred.";
+                    status.textContent = "❌ An unexpected error occurred while getting location.";
                     break;
             }
         },
         {
-            enableHighAccuracy: true, // Forces Android to use GPS instead of just Wi-Fi
-            timeout: 10000,
-            maximumAge: 0
+            enableHighAccuracy: true, // Forces phone hardware GPS instead of loose cell-tower estimation
+            timeout: 12000,           // Gives the phone up to 12 seconds to stabilize the GPS lock
+            maximumAge: 0             // Prevents browser from pulling cached, old location data
         }
     );
 }
