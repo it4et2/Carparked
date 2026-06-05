@@ -358,6 +358,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedRecipient) {
         document.getElementById('extra-input').value = savedRecipient;
         document.getElementById('remember-recipient').checked = true;
+        document.getElementById('login-error').classList.add('hidden');
     }
 });
 
