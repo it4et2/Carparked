@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure GPS Vehicle Dispatcher</title>
+    <title>Car Parked Reminder</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -36,9 +36,6 @@
             align-items: center;
         }
         
-        /* ================================================================= */
-        /* TAB SWITCHER LAYOUT SECTION */
-        /* ================================================================= */
         .tab-box {
             display: flex;
             width: 100%;
@@ -47,7 +44,7 @@
             padding: 4px;
             box-sizing: border-box;
             margin-bottom: 20px;
-            order: 1; /* Keeps tabs at the top of the container */
+            order: 1;
         }
         .tab {
             flex: 1;
@@ -60,7 +57,6 @@
             border-radius: 6px;
             transition: all 0.2s ease;
         }
-        /* Active Tab States */
         .tab.active-email {
             background: #007bff;
             color: white;
@@ -90,12 +86,11 @@
             font-weight: bold;
             width: 100%;
             box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-            transition: background 0.2s, transform 0.1s;
-            order: 2; /* Pushed directly under tabs */
+            transition: background 0.2s;
+            order: 2; 
             margin-top: 5px;
             margin-bottom: 10px;
         }
-        /* Mode styles controlled via Javascript changes */
         .mode-email {
             background-color: #007bff;
         }
@@ -118,7 +113,7 @@
             order: 4;
         }
 
-        /* Login Screen Layout Styles */
+        /* Login Screen Layout */
         .login-title {
             color: #333;
             font-size: 22px;
@@ -193,18 +188,17 @@
         <div id="tab-sms" class="tab" onclick="setMode('sms')">💬 SMS Mode</div>
     </div>
 
-    <button id="dispatch-btn" class="btn-gps mode-email" onclick="sendLocation()">🚗 Dispatch Location via Email</button>
+    <button id="dispatch-btn" class="btn-gps mode-email" onclick="sendLocation()">🚗 Save Location via Email</button>
     
-    <h2 class="order-title" id="display-title">GPS Email Dispatch</h2>
-    <p id="status">Tap the button above to generate your location dispatch.</p>
+    <h2 class="order-title" id="display-title">Car Parked Reminder</h2>
+    <p id="status">Tap the button above to log your parking coordinates.</p>
 </div>
 
 <script>
-// ⚠️ CONFIGURE YOUR PERSONAL TARGET LINKS HERE
+// ⚠️ CONFIGURE YOUR TARGET LINKS HERE
 const targetEmail = "your-email@example.com"; 
 const targetPhone = "0400000000"; 
 
-// Active transmission tracking variable ('email' or 'sms')
 let currentMode = 'email';
 
 function setMode(mode) {
@@ -215,20 +209,20 @@ function setMode(mode) {
     const displayTitle = document.getElementById('display-title');
     const status = document.getElementById('status');
 
-    status.textContent = "Tap the button above to generate your location dispatch.";
+    status.textContent = "Tap the button above to log your parking coordinates.";
 
     if (mode === 'email') {
         tabEmail.className = "tab active-email";
         tabSMS.className = "tab";
         dispatchBtn.className = "btn-gps mode-email";
-        dispatchBtn.innerHTML = "🚗 Dispatch Location via Email";
-        displayTitle.textContent = "GPS Email Dispatch";
+        dispatchBtn.innerHTML = "🚗 Save Location via Email";
+        displayTitle.textContent = "Car Parked Reminder";
     } else {
         tabEmail.className = "tab";
         tabSMS.className = "tab active-sms";
         dispatchBtn.className = "btn-gps mode-sms";
-        dispatchBtn.innerHTML = "🚗 Dispatch Location via SMS";
-        displayTitle.textContent = "GPS SMS Dispatch";
+        dispatchBtn.innerHTML = "🚗 Save Location via SMS";
+        displayTitle.textContent = "Car Parked Reminder";
     }
 }
 
@@ -238,7 +232,7 @@ function checkPassword() {
     const loginBox = document.getElementById('login-box');
     const gpsBox = document.getElementById('gps-box');
 
-    if (passwordInput === "     ") {
+    if (passwordInput === "12345") {
         loginBox.classList.add('hidden');
         gpsBox.classList.remove('hidden');
     } else {
@@ -261,7 +255,7 @@ function sendLocation() {
         return;
     }
 
-    status.textContent = `🔄 Locating your device via GPS for ${currentMode.toUpperCase()}...`;
+    status.textContent = `🔄 Pinpointing parking spot via GPS...`;
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -272,14 +266,13 @@ function sendLocation() {
             const carImageLink = "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500";
 
             if (currentMode === 'email') {
-                // Execute Email Dispatch String Formatting
-                status.textContent = "✅ Location found! Opening your Email app...";
-                const subject = encodeURIComponent("🚨 [VEHICLE UPDATE] New GPS Location Logged 🚗");
+                status.textContent = "✅ Location found! Opening Email app...";
+                const subject = encodeURIComponent("🅿️ [CAR PARKED REMINDER] Spot Successfully Logged 🚗");
                 const body = encodeURIComponent(
-                    `Automated Vehicle Dispatch Notification\n` +
+                    `🅿️ CAR PARKED REMINDER LOCATION 🚗\n` +
                     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-                    `📍 LIVE MAP LOCATION LINK:\n\n${mapsLink}\n\n` +
-                    `📸 ATTACHED VEHICLE PREVIEW:\n\n${carImageLink}\n\n` +
+                    `📍 VECHILE MAP PIN LINK:\n\n${mapsLink}\n\n` +
+                    `📸 REFERENCE VISUAL:\n\n${carImageLink}\n\n` +
                     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
                     `📊 DETAILS:\n` +
                     `• Latitude: ${latitude}\n` +
@@ -288,11 +281,10 @@ function sendLocation() {
                 );
                 window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
             } else {
-                // Execute Android Native SMS String Formatting
-                status.textContent = "✅ Location found! Opening your Messages app...";
+                status.textContent = "✅ Location found! Opening Messages app...";
                 const smsBody = encodeURIComponent(
-                    `🚨 VEHICLE DISPATCH ALERT 🚨\n` +
-                    `My current location: ${mapsLink}\n\n` +
+                    `🅿️ CAR PARKED REMINDER 🚗\n` +
+                    `Vehicle location pin: ${mapsLink}\n\n` +
                     `Coordinates: ${latitude}, ${longitude}`
                 );
                 window.location.href = `sms:${targetPhone}?body=${smsBody}`;
