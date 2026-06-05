@@ -401,6 +401,7 @@ async function selectContact() {
 }
 
 function sendLocation() {
+    if (navigator.vibrate) navigator.vibrate(50);
     const status = document.getElementById('status');
 
     if (!navigator.geolocation) {
