@@ -3,40 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure GPS Location Sender</title>
+    <title>Secure GPS Vehicle Dispatcher</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; 
+            padding-top: 40px;          
             height: 100vh;
-            background-color: #f0f2f5;
             margin: 0;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('world_car_bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            box-sizing: border-box;
         }
         .container {
-            text-align: center;
             padding: 30px;
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             max-width: 90%;
             width: 350px;
             box-sizing: border-box;
+            backdrop-filter: blur(5px);
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        h2 {
-            color: #333;
+        
+        /* ================================================================= */
+        /* TAB SWITCHER LAYOUT SECTION */
+        /* ================================================================= */
+        .tab-box {
+            display: flex;
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 8px;
+            padding: 4px;
+            box-sizing: border-box;
             margin-bottom: 20px;
+            order: 1; /* Keeps tabs at the top of the container */
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        /* Active Tab States */
+        .tab.active-email {
+            background: #007bff;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .tab.active-sms {
+            background: #28a745;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        
+        .order-title {
+            color: #333;
             font-size: 22px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            order: 3; 
+        }
+        
+        .btn-gps {
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: background 0.2s, transform 0.1s;
+            order: 2; /* Pushed directly under tabs */
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        /* Mode styles controlled via Javascript changes */
+        .mode-email {
+            background-color: #007bff;
+        }
+        .mode-email:active {
+            background-color: #0056b3;
+        }
+        .mode-sms {
+            background-color: #28a745;
+        }
+        .mode-sms:active {
+            background-color: #1e7e34;
+        }
+        
+        #status {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            order: 4;
+        }
+
+        /* Login Screen Layout Styles */
+        .login-title {
+            color: #333;
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
         .input-group {
-            margin-bottom: 15px;
+            width: 100%;
+            margin-bottom: 20px;
             text-align: left;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #666;
             font-size: 14px;
         }
@@ -52,7 +148,8 @@
         input[type="password"]:focus {
             border-color: #007bff;
         }
-        button {
+        .btn-login {
+            background-color: #333;
             color: white;
             border: none;
             padding: 15px 30px;
@@ -61,43 +158,26 @@
             cursor: pointer;
             font-weight: bold;
             width: 100%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: background 0.2s;
-        }
-        .btn-login {
-            background-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .btn-login:active {
-            background-color: #0056b3;
-        }
-        .btn-gps {
-            background-color: #28a745;
-        }
-        .btn-gps:active {
-            background-color: #218838;
-        }
-        #status, #login-error {
-            margin-top: 20px;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-        #status {
-            color: #666;
+            background-color: #111;
         }
         #login-error {
             color: #dc3545;
             font-weight: bold;
+            font-size: 14px;
+            margin-top: 15px;
         }
-        /* Hidden by default */
         .hidden {
-            display: none;
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
 <div class="container" id="login-box">
-    <h2>Device Login</h2>
+    <h2 class="login-title">Device Login</h2>
     <div class="input-group">
         <label for="password">Enter Access Password:</label>
         <input type="password" id="password" placeholder="•••••" autofocus>
@@ -107,34 +187,66 @@
 </div>
 
 <div class="container hidden" id="gps-box">
-    <h2>GPS Location Sender</h2>
-    <button class="btn-gps" onclick="sendLocation()">📍 Share My Location</button>
-    <p id="status">Tap the button above to generate your location email.</p>
+    
+    <div class="tab-box">
+        <div id="tab-email" class="tab active-email" onclick="setMode('email')">✉️ Email Mode</div>
+        <div id="tab-sms" class="tab" onclick="setMode('sms')">💬 SMS Mode</div>
+    </div>
+
+    <button id="dispatch-btn" class="btn-gps mode-email" onclick="sendLocation()">🚗 Dispatch Location via Email</button>
+    
+    <h2 class="order-title" id="display-title">GPS Email Dispatch</h2>
+    <p id="status">Tap the button above to generate your location dispatch.</p>
 </div>
 
 <script>
-// ⚠️ CHANGE THIS TO YOUR ACTUAL EMAIL ADDRESS
-const targetEmail = "2019srb@gmail.com"; 
+// ⚠️ CONFIGURE YOUR PERSONAL TARGET LINKS HERE
+const targetEmail = "your-email@example.com"; 
+const targetPhone = "0400000000"; 
 
-// Password verification function
+// Active transmission tracking variable ('email' or 'sms')
+let currentMode = 'email';
+
+function setMode(mode) {
+    currentMode = mode;
+    const tabEmail = document.getElementById('tab-email');
+    const tabSMS = document.getElementById('tab-sms');
+    const dispatchBtn = document.getElementById('dispatch-btn');
+    const displayTitle = document.getElementById('display-title');
+    const status = document.getElementById('status');
+
+    status.textContent = "Tap the button above to generate your location dispatch.";
+
+    if (mode === 'email') {
+        tabEmail.className = "tab active-email";
+        tabSMS.className = "tab";
+        dispatchBtn.className = "btn-gps mode-email";
+        dispatchBtn.innerHTML = "🚗 Dispatch Location via Email";
+        displayTitle.textContent = "GPS Email Dispatch";
+    } else {
+        tabEmail.className = "tab";
+        tabSMS.className = "tab active-sms";
+        dispatchBtn.className = "btn-gps mode-sms";
+        dispatchBtn.innerHTML = "🚗 Dispatch Location via SMS";
+        displayTitle.textContent = "GPS SMS Dispatch";
+    }
+}
+
 function checkPassword() {
     const passwordInput = document.getElementById('password').value;
     const loginError = document.getElementById('login-error');
     const loginBox = document.getElementById('login-box');
     const gpsBox = document.getElementById('gps-box');
 
-    if (passwordInput === "     ") {
-        // Hide login, show GPS panel
+    if (passwordInput === "12345") {
         loginBox.classList.add('hidden');
         gpsBox.classList.remove('hidden');
     } else {
-        // Show error message and clear input
         loginError.classList.remove('hidden');
         document.getElementById('password').value = '';
     }
 }
 
-// Allow pressing "Enter" key to log in
 document.getElementById('password').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         checkPassword();
@@ -149,56 +261,63 @@ function sendLocation() {
         return;
     }
 
-    status.textContent = "🔄 Locating your device via GPS...";
+    status.textContent = `🔄 Locating your device via GPS for ${currentMode.toUpperCase()}...`;
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             
-            // Corrected, clean universal Google Maps link format
             const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
-            
-            status.textContent = "✅ Location found! Opening your email app...";
+            const carImageLink = "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500";
 
-            // Subject line for the email
-            const subject = encodeURIComponent("📍 Location Shared via GPS");
-            
-            // Isolated link layout to trigger Android's automatic link-preview system
-            const body = encodeURIComponent(
-                `I am sharing my current GPS coordinates with you.\n\n` +
-                `Click the link below to view the live location map:\n\n` +
-                `${mapsLink}\n\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `Raw Data Details:\n` +
-                `• Latitude: ${latitude}\n` +
-                `• Longitude: ${longitude}\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
-            );
-            
-            // Redirects to native Android mail application
-            window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+            if (currentMode === 'email') {
+                // Execute Email Dispatch String Formatting
+                status.textContent = "✅ Location found! Opening your Email app...";
+                const subject = encodeURIComponent("🚨 [VEHICLE UPDATE] New GPS Location Logged 🚗");
+                const body = encodeURIComponent(
+                    `Automated Vehicle Dispatch Notification\n` +
+                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                    `📍 LIVE MAP LOCATION LINK:\n\n${mapsLink}\n\n` +
+                    `📸 ATTACHED VEHICLE PREVIEW:\n\n${carImageLink}\n\n` +
+                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                    `📊 DETAILS:\n` +
+                    `• Latitude: ${latitude}\n` +
+                    `• Longitude: ${longitude}\n` +
+                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
+                );
+                window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+            } else {
+                // Execute Android Native SMS String Formatting
+                status.textContent = "✅ Location found! Opening your Messages app...";
+                const smsBody = encodeURIComponent(
+                    `🚨 VEHICLE DISPATCH ALERT 🚨\n` +
+                    `My current location: ${mapsLink}\n\n` +
+                    `Coordinates: ${latitude}, ${longitude}`
+                );
+                window.location.href = `sms:${targetPhone}?body=${smsBody}`;
+            }
         },
         (error) => {
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    status.textContent = "❌ Permission denied. Please allow location access in your browser settings.";
+                    status.textContent = "❌ Permission denied. Please allow location access.";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    status.textContent = "❌ Location unavailable. Check if your phone's GPS/Location setting is turned ON.";
+                    status.textContent = "❌ Location unavailable. Check GPS settings.";
                     break;
                 case error.TIMEOUT:
-                    status.textContent = "❌ The request to get your location timed out. Try again.";
+                    status.textContent = "❌ The request timed out. Try again.";
                     break;
                 default:
-                    status.textContent = "❌ An unexpected error occurred while getting location.";
+                    status.textContent = "❌ An unexpected error occurred.";
                     break;
             }
         },
         {
-            enableHighAccuracy: true, // Forces hardware GPS sensor instead of cell tower estimates
-            timeout: 12000,           // Extends timeout threshold to 12 seconds for weak signals
-            maximumAge: 0             // Prevents the browser from pulling old cached data
+            enableHighAccuracy: true,
+            timeout: 12000,
+            maximumAge: 0
         }
     );
 }
